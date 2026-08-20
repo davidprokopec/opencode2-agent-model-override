@@ -1,0 +1,38 @@
+version: 2
+updates:
+  # Pinned action SHAs are safe but unreadable, so let Dependabot move them and
+  # keep the trailing version comment in step.
+  - package-ecosystem: github-actions
+    directory: "/"
+    target-branch: develop
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: "chore(deps)"
+    groups:
+      actions:
+        patterns: ["*"]
+
+  # `bun`, not `npm`: this repo's lockfile is bun.lock, and the npm ecosystem
+  # updates package.json without it, producing pull requests that can never
+  # pass `bun install --frozen-lockfile`. Note that Dependabot does not offer
+  # *security* updates for the bun ecosystem, only version updates — alerts
+  # still arrive, but fixes for those are a manual bump.
+  - package-ecosystem: bun
+    directory: "/"
+    target-branch: develop
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: "chore(deps)"
+    groups:
+      dev:
+        dependency-type: development
+    # Everything below is pinned to the OpenCode build this plugin runs inside,
+    # not chosen freely. `effect` must be the exact version @opencode-ai/plugin
+    # depends on or the plugin loads a second Effect instance whose types and
+    # runtime do not match the host's. Bumping either is a compatibility
+    # decision that belongs with an OpenCode upgrade.
+    ignore:
+      - dependency-name: "@opencode-ai/*"
+      - dependency-name: "effect"
